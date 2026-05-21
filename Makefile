@@ -13,7 +13,7 @@ test:
 
 install:
 	@mkdir -p $(INSTALL_DIR)
-	cp $(INSTALL_FILE) $(INSTALL_DIR)/$(INSTALL_FILE)
+	install -m 644 $(INSTALL_FILE) $(INSTALL_DIR)/$(INSTALL_FILE)
 	@if grep -qF '$(INSTALL_FILE)' $(ZSHRC) 2>/dev/null; then \
 		echo "✓ Already sourced in ~/.zshrc"; \
 	else \
