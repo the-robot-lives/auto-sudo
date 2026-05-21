@@ -13,7 +13,12 @@ test:
 
 install:
 	@mkdir -p $(INSTALL_DIR)
-	install -m 644 $(INSTALL_FILE) $(INSTALL_DIR)/$(INSTALL_FILE)
+	@src=$$(realpath $(INSTALL_FILE)); dst=$$(realpath $(INSTALL_DIR)/$(INSTALL_FILE) 2>/dev/null); \
+	if [ "$$src" = "$$dst" ]; then \
+		echo "auto-sudo: already installed (same file) — skipping"; \
+	else \
+		install -m 644 $(INSTALL_FILE) $(INSTALL_DIR)/$(INSTALL_FILE); \
+	fi
 	@if grep -qF '$(INSTALL_FILE)' $(ZSHRC) 2>/dev/null; then \
 		echo "✓ Already sourced in ~/.zshrc"; \
 	else \
