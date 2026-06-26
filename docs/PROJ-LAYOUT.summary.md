@@ -1,8 +1,11 @@
 ```
 auto-sudo/
-├── vim.zsh
+├── auto-sudo.zsh
+├── config.example.yaml
+├── rust/
+│   ├── Cargo.toml
+│   ├── Cargo.lock
+│   └── src/
 ├── docs/
-│   ├── PROJ-LAYOUT.md
-│   └── PROJ-LAYOUT.summary.md
 └── README.md
 ```

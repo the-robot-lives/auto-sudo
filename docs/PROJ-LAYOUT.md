@@ -2,20 +2,29 @@
 
 ```
 auto-sudo/
-├── vim.zsh                 # Zsh function shim — auto-elevates vim with sudo for unwritable files
+├── auto-sudo.zsh           # zsh loader for generated wrappers
+├── config.example.yaml     # default YAML rules
+├── rust/                   # Rust CLI crate
+│   ├── Cargo.toml
+│   └── src/
 ├── docs/                   # Documentation
-│   ├── PROJ-LAYOUT.md      # This file — project structure map
-│   └── PROJ-LAYOUT.summary.md  # Quick-reference tree
-└── README.md               # Project description and purpose
+└── README.md               # Project description and usage
 ```
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
-| `vim.zsh` | Source in `.zshrc` to enable auto-sudo vim behavior |
+| `rust/src/main.rs` | CLI entrypoint |
+| `rust/src/config.rs` | Config schema and loading |
+| `rust/src/decision.rs` | sudo decision engine |
+| `rust/src/shell.rs` | shell wrapper generator |
+| `rust/src/sudoers.rs` | sudoers snippet manager |
+| `auto-sudo.zsh` | Source in `.zshrc` to enable generated wrappers |
+| `config.example.yaml` | Starter rules for vim/chmod/chown/chgrp |
 | `README.md` | Describes the auto-sudo concept |
 
 ## Usage
 
-Source `vim.zsh` in your shell profile to override the `vim` command with a wrapper that detects write permission and auto-elevates via `sudo` when needed.
+Run `make install`, edit `~/.config/auto-sudo/config.yaml`, then source the
+installed loader from `.zshrc`.
