@@ -125,8 +125,15 @@ fn collect_entries(config: &Config, extra_commands: &[String]) -> Result<Vec<Ent
     let mut entries = Vec::new();
 
     for (command, command_config) in &config.commands {
+        if command_config.always_sudo() {
+            let sudo = config.sudo_for_command(command_config);
+            let id = entry_id(command, &sudo);
+            if seen.insert(id.clone()) {
+                entries.push(entry_for(command, sudo, id)?);
+            }
+        }
         for rule in &command_config.rules {
-            let sudo = config.sudo_for_rule(rule);
+            let sudo = config.sudo_for_rule(command_config, rule);
             let id = entry_id(command, &sudo);
             if seen.insert(id.clone()) {
                 entries.push(entry_for(command, sudo, id)?);
@@ -234,6 +241,22 @@ mod tests {
         let config: Config = serde_yaml::from_str("version: 1\ncommands: {}\n").unwrap();
         let body = render(&config, &["sh".to_string()]).unwrap();
         assert!(body.contains("# AUTO-SUDO ENTRY"));
+        assert!(body.contains("NOPASSWD: sha256:"));
+    }
+
+    #[test]
+    fn renders_always_sudo_command_entry_without_rules() {
+        let config: Config = serde_yaml::from_str(
+            r#"
+version: 1
+commands:
+  sh:
+    always_sudo: true
+"#,
+        )
+        .unwrap();
+        let body = render(&config, &[]).unwrap();
+        assert!(body.contains("command=sh"));
         assert!(body.contains("NOPASSWD: sha256:"));
     }
 

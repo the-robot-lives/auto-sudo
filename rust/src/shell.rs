@@ -37,6 +37,9 @@ fn render_function(command: &str, kind: ShellKind) -> String {
   [[ ! -t 1 ]] && _auto_sudo_pipe_args+=(--stdout-piped)
   _auto_sudo_prefix="$(auto-sudo decide "${{_auto_sudo_pipe_args[@]}}" -- {quoted} "$@")" || return $?
   if [[ -n "$_auto_sudo_prefix" ]]; then
+    printf '\033[1;33mAuto Sudo {command}\033[0m' >&2
+    (( $# > 0 )) && printf ' %s' "$*" >&2
+    printf '\n' >&2
     eval "command ${{_auto_sudo_prefix}}{quoted} \"\$@\""
   else
     command {quoted} "$@"
@@ -92,5 +95,6 @@ commands:
         assert!(body.contains("vim()"));
         assert!(body.contains("auto-sudo decide"));
         assert!(body.contains("--stdin-piped"));
+        assert!(body.contains("printf '\\033[1;33mAuto Sudo vim\\033[0m'"));
     }
 }

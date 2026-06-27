@@ -6,6 +6,8 @@
 # Design notes:
 # - Pipes are denied globally. Commands that are naturally used in pipelines
 #   must opt in with allow_pipes: true.
+# - Set always_sudo: true on a command to make its generated function always
+#   run through sudo while still respecting allow_pipes.
 # - Rules are evaluated top to bottom per command. First match wins.
 # - A path-only file check intentionally means "sudo for this path".
 # - Use `auto-sudo decide --explain -- <command> ...` to see why a prefix was
@@ -369,10 +371,7 @@ commands:
   launchctl: &admin_command
     wrap: true
     allow_pipes: false
-    rules:
-      - name: administrative-command
-        when:
-          always: true
+    always_sudo: true
 
   dscacheutil: *admin_command
   # Uncomment if the executable is readable by the current user or you run

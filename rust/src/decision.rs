@@ -32,9 +32,17 @@ pub fn decide(config: &Config, request: &DecisionRequest<'_>) -> Result<Decision
         });
     }
 
+    if command_config.always_sudo() {
+        let sudo = config.sudo_for_command(command_config);
+        return Ok(Decision {
+            prefix: render_prefix(&sudo)?,
+            reason: format!("always_sudo enabled for {}", request.command),
+        });
+    }
+
     for rule in &command_config.rules {
         if rule_matches(rule, request)? {
-            let sudo = config.sudo_for_rule(rule);
+            let sudo = config.sudo_for_rule(command_config, rule);
             return Ok(Decision {
                 prefix: render_prefix(&sudo)?,
                 reason: format!(
@@ -438,6 +446,67 @@ commands:
             stdout_piped: false,
         };
         assert_eq!(decide(&config, &request).unwrap().prefix, "sudo ");
+    }
+
+    #[test]
+    fn command_level_always_sudo_returns_sudo_prefix() {
+        let config = cfg(r#"
+version: 1
+commands:
+  systemctl:
+    always_sudo: true
+"#);
+        let request = DecisionRequest {
+            command: "systemctl",
+            args: &["restart".into(), "nginx".into()],
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        let decision = decide(&config, &request).unwrap();
+        assert_eq!(decision.prefix, "sudo ");
+        assert_eq!(decision.reason, "always_sudo enabled for systemctl");
+    }
+
+    #[test]
+    fn command_level_sudo_overrides_default_for_always_sudo() {
+        let config = cfg(r#"
+version: 1
+commands:
+  psql:
+    always_sudo: true
+    sudo:
+      mode: user
+      user: postgres
+"#);
+        let request = DecisionRequest {
+            command: "psql",
+            args: &[],
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        assert_eq!(
+            decide(&config, &request).unwrap().prefix,
+            "sudo -u postgres "
+        );
+    }
+
+    #[test]
+    fn command_level_always_sudo_respects_pipe_policy() {
+        let config = cfg(r#"
+version: 1
+defaults:
+  allow_pipes: false
+commands:
+  systemctl:
+    always_sudo: true
+"#);
+        let request = DecisionRequest {
+            command: "systemctl",
+            args: &[],
+            stdin_piped: true,
+            stdout_piped: false,
+        };
+        assert_eq!(decide(&config, &request).unwrap().prefix, "");
     }
 
     #[test]

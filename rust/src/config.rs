@@ -25,6 +25,9 @@ pub struct CommandConfig {
     pub wrap: Option<bool>,
     pub allow_pipes: Option<bool>,
     #[serde(default)]
+    pub always_sudo: bool,
+    pub sudo: Option<SudoSpec>,
+    #[serde(default)]
     pub rules: Vec<Rule>,
 }
 
@@ -155,10 +158,19 @@ impl Config {
             .map_err(|err| format!("failed to parse {}: {err}", path.display()))
     }
 
-    pub fn sudo_for_rule<'a>(&'a self, rule: &'a Rule) -> SudoSpec {
+    pub fn sudo_for_command(&self, command_config: &CommandConfig) -> SudoSpec {
+        command_config
+            .sudo
+            .clone()
+            .or_else(|| self.defaults.sudo.clone())
+            .unwrap_or_default()
+    }
+
+    pub fn sudo_for_rule(&self, command_config: &CommandConfig, rule: &Rule) -> SudoSpec {
         rule.action
             .as_ref()
             .map(|action| action.sudo.clone())
+            .or_else(|| command_config.sudo.clone())
             .or_else(|| self.defaults.sudo.clone())
             .unwrap_or_default()
     }
@@ -167,6 +179,10 @@ impl Config {
 impl CommandConfig {
     pub fn should_wrap(&self) -> bool {
         self.wrap.unwrap_or(true)
+    }
+
+    pub fn always_sudo(&self) -> bool {
+        self.always_sudo
     }
 
     pub fn allow_pipes(&self, defaults: &Defaults) -> bool {

@@ -3,8 +3,9 @@
 ## Overview
 
 auto-sudo is a Rust CLI that generates shell wrappers and decides whether a
-command should be prefixed with `sudo` based on YAML rules. The wrapper calls
-`auto-sudo decide`, receives a prefix, then invokes the real command.
+command should be prefixed with `sudo` based on YAML rules or command-level
+`always_sudo` settings. The wrapper calls `auto-sudo decide`, receives a prefix,
+prints a yellow notice when sudo will be used, then invokes the real command.
 
 ## Design
 
@@ -36,7 +37,7 @@ flowchart TD
 ## Key Design Decisions
 
 - **CLI decides, shell executes**: `auto-sudo decide` only prints a prefix. It never executes the target command.
-- **Config-driven behavior**: Commands, file arguments, flags, pipe policy, and sudo target users are YAML data.
+- **Config-driven behavior**: Commands, command-level always-sudo behavior, file arguments, flags, pipe policy, and sudo target users are YAML data.
 - **Fail closed on config errors**: Wrapper generation and decision calls return non-zero if config cannot be parsed.
 - **Pipes denied by default**: `allow_pipes` must be enabled globally or per command to auto-sudo in pipelines.
 - **sudoers writes are explicit**: Snippets print by default; writes require an explicit `sudoers write` or `refresh`.

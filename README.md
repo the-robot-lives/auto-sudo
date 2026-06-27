@@ -29,6 +29,8 @@ auto-sudo sudoers refresh --file /etc/sudoers.d/auto-sudo
 
 `decide` prints only the prefix that a shell wrapper should apply: `sudo `,
 `sudo -u user `, or an empty string. It does not execute the wrapped command.
+Generated wrappers print a yellow `Auto Sudo <command>` notice to stderr before
+invoking a sudo-prefixed command, so it appears before any sudo password prompt.
 
 `config.example.yaml` preserves the old behavior for `vim`, `chmod`, `chown`,
 and `chgrp`, but the behavior is now data-driven.
@@ -36,3 +38,16 @@ and `chgrp`, but the behavior is now data-driven.
 File rules can select arguments by raw position, `position: any`,
 `--flag=value`, or `--flag value`. File checks include permissions, ownership,
 group membership, exact/wildcard paths, path prefixes, and path suffixes.
+
+Use `always_sudo: true` on a command to make its generated function always run
+through sudo while still respecting `allow_pipes`:
+
+```yaml
+commands:
+  systemctl:
+    wrap: true
+    always_sudo: true
+```
+
+Set command-level `sudo:` when an always-sudo wrapper should run as a specific
+user or group.
