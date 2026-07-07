@@ -105,6 +105,8 @@ pub struct FileChecks {
     #[serde(default)]
     pub missing_parent_not_writable: bool,
     #[serde(default)]
+    pub missing_parent_not_readable: bool,
+    #[serde(default)]
     pub current_user_can_read: bool,
     #[serde(default)]
     pub current_user_can_write: bool,

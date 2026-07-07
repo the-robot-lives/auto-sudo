@@ -166,24 +166,57 @@ fn checks_match(path: &Path, checks: &FileChecks) -> Result<bool, String> {
             return Ok(false);
         }
     }
+    if checks.missing_parent_not_readable {
+        if exists {
+            return Ok(false);
+        }
+        let parent = path
+            .parent()
+            .filter(|p| !p.as_os_str().is_empty())
+            .unwrap_or_else(|| Path::new("."));
+        if can_access(parent, Access::Read) {
+            return Ok(false);
+        }
+    }
 
-    if checks.current_user_can_read && !can_access(path, Access::Read) {
-        return Ok(false);
-    }
-    if checks.current_user_can_write && !can_access(path, Access::Write) {
-        return Ok(false);
-    }
-    if checks.current_user_can_execute && !can_access(path, Access::Execute) {
-        return Ok(false);
-    }
-    if checks.current_user_cannot_read && can_access(path, Access::Read) {
-        return Ok(false);
-    }
-    if checks.current_user_cannot_write && can_access(path, Access::Write) {
-        return Ok(false);
-    }
-    if checks.current_user_cannot_execute && can_access(path, Access::Execute) {
-        return Ok(false);
+    // File-level access checks describe an *existing* file's permissions. A
+    // path that doesn't exist isn't "permission-denied" — it's simply absent,
+    // so cat/vim/less will report "no such file" and sudo cannot help. Treat
+    // the missing-file case via the parent-directory checks below
+    // (missing_parent_not_writable / missing_parent_not_readable), which
+    // inspect the parent dir to decide whether the user could create/read the
+    // file. Without this guard, `current_user_cannot_read` matched missing
+    // files (fs::metadata fails -> can_access returns false -> "cannot read"),
+    // escalating `cat /tmp/new-note.txt` and `vim /tmp/new-note.txt` to sudo.
+    if !exists {
+        if checks.current_user_can_read
+            || checks.current_user_can_write
+            || checks.current_user_can_execute
+            || checks.current_user_cannot_read
+            || checks.current_user_cannot_write
+            || checks.current_user_cannot_execute
+        {
+            return Ok(false);
+        }
+    } else {
+        if checks.current_user_can_read && !can_access(path, Access::Read) {
+            return Ok(false);
+        }
+        if checks.current_user_can_write && !can_access(path, Access::Write) {
+            return Ok(false);
+        }
+        if checks.current_user_can_execute && !can_access(path, Access::Execute) {
+            return Ok(false);
+        }
+        if checks.current_user_cannot_read && can_access(path, Access::Read) {
+            return Ok(false);
+        }
+        if checks.current_user_cannot_write && can_access(path, Access::Write) {
+            return Ok(false);
+        }
+        if checks.current_user_cannot_execute && can_access(path, Access::Execute) {
+            return Ok(false);
+        }
     }
 
     if checks.owner_is_current_user || checks.owner_is_not_current_user {
@@ -537,6 +570,145 @@ commands:
         };
         assert_eq!(decide(&config, &request).unwrap().prefix, "sudo ");
         let _ = fs::remove_file(path);
+    }
+
+    #[test]
+    fn missing_file_in_writable_parent_does_not_sudo_for_read() {
+        // cat/less/bat rule: current_user_cannot_read. A missing file is not
+        // "unreadable" — the parent is user-writable, so no sudo is needed.
+        let dir = temp_path("missing-read-dir");
+        fs::create_dir_all(&dir).unwrap();
+        let missing = dir.join("does-not-exist.txt");
+        let config = cfg(r#"
+version: 1
+commands:
+  cat:
+    rules:
+      - name: read-unreadable
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            current_user_cannot_read: true
+"#);
+        let args = vec![missing.to_string_lossy().to_string()];
+        let request = DecisionRequest {
+            command: "cat",
+            args: &args,
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        assert_eq!(decide(&config, &request).unwrap().prefix, "");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn missing_file_in_writable_parent_does_not_sudo_for_editor() {
+        // vim rule: current_user_cannot_read. Same fix applies — a missing
+        // file the user could create must not escalate.
+        let dir = temp_path("missing-vim-dir");
+        fs::create_dir_all(&dir).unwrap();
+        let missing = dir.join("new-note.txt");
+        let config = cfg(r#"
+version: 1
+commands:
+  vim:
+    rules:
+      - name: edit-existing-file-without-read-permission
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            current_user_cannot_read: true
+      - name: create-file-in-unwritable-directory
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+"#);
+        let args = vec![missing.to_string_lossy().to_string()];
+        let request = DecisionRequest {
+            command: "vim",
+            args: &args,
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        assert_eq!(decide(&config, &request).unwrap().prefix, "");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn missing_file_in_unwritable_parent_still_sudos_for_editor() {
+        // The parent-dir check still fires when the user genuinely can't
+        // create the file. /etc is root-owned, so vim /etc/new.conf escalates.
+        let config = cfg(r#"
+version: 1
+commands:
+  vim:
+    rules:
+      - name: edit-existing-file-without-read-permission
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            current_user_cannot_read: true
+      - name: create-file-in-unwritable-directory
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+"#);
+        let args = vec!["/etc/auto-sudo-probe-missing.conf".to_string()];
+        let request = DecisionRequest {
+            command: "vim",
+            args: &args,
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        assert_eq!(decide(&config, &request).unwrap().prefix, "sudo ");
+    }
+
+    #[test]
+    fn missing_file_still_matches_can_read_check() {
+        // Sanity: positive access checks on a missing file are skipped too
+        // (they would have returned false anyway because metadata fails).
+        let dir = temp_path("missing-canread-dir");
+        fs::create_dir_all(&dir).unwrap();
+        let missing = dir.join("nope.txt");
+        let config = cfg(r#"
+version: 1
+commands:
+  cat:
+    rules:
+      - name: only-readable
+        args:
+          files:
+            - position: any
+        when:
+          any_file:
+            current_user_can_read: true
+"#);
+        let args = vec![missing.to_string_lossy().to_string()];
+        let request = DecisionRequest {
+            command: "cat",
+            args: &args,
+            stdin_piped: false,
+            stdout_piped: false,
+        };
+        assert_eq!(decide(&config, &request).unwrap().prefix, "");
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
