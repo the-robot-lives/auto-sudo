@@ -42,6 +42,24 @@ flowchart TD
 - **Pipes denied by default**: `allow_pipes` must be enabled globally or per command to auto-sudo in pipelines.
 - **sudoers writes are explicit**: Snippets print by default; writes require an explicit `sudoers write` or `refresh`.
 
+## Install Model
+
+`make install` compiles the Rust crate (`cargo build --release`), copies the
+binary to `~/.local/bin/auto-sudo`, installs the zsh loader to
+`~/.local/share/auto-sudo/`, seeds `~/.config/auto-sudo/config.yaml` from
+`config.example.yaml` (never overwriting an existing config), and appends a
+source line to `~/.zshrc` if absent.
+
+## Ecosystem Fit
+
+auto-sudo lives under `utilities/shell/` in the Noizu Infra monorepo but is a
+standalone Rust project, not a shell script: it has its own `Makefile` and is
+installed directly via `make install` in this directory rather than through the
+repo-root `make install-utilities` flow. It does not source `share/k8-lib/` and
+reads no `.infra-config.yaml` — its only configuration surface is
+`~/.config/auto-sudo/config.yaml`. It shares the ecosystem convention of
+installing user tooling into `~/.local/bin`.
+
 ## Extensibility
 
 Add commands and rules to `~/.config/auto-sudo/config.yaml`. Supported file
