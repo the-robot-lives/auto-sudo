@@ -143,12 +143,14 @@ impl Default for SudoSpec {
 }
 
 impl Config {
+    // ⟦𓄈𓄚𓋅𓅎⟧ default_path :: auto-generated pointer for public function default_path
     pub fn default_path() -> Result<PathBuf, String> {
         dirs::home_dir()
             .map(|home| home.join(".config/auto-sudo/config.yaml"))
             .ok_or_else(|| "could not resolve home directory".to_string())
     }
 
+    // ⟦𓐣𓐧𓈌𓉻⟧ load :: auto-generated pointer for public function load
     pub fn load(path: Option<&Path>) -> Result<Self, String> {
         let path = match path {
             Some(path) => path.to_path_buf(),
@@ -160,6 +162,7 @@ impl Config {
             .map_err(|err| format!("failed to parse {}: {err}", path.display()))
     }
 
+    // ⟦𓍒𓆳𓍝𓌄⟧ sudo_for_command :: auto-generated pointer for public function sudo_for_command
     pub fn sudo_for_command(&self, command_config: &CommandConfig) -> SudoSpec {
         command_config
             .sudo
@@ -168,6 +171,7 @@ impl Config {
             .unwrap_or_default()
     }
 
+    // ⟦𓊵𓌶𓅲𓆚⟧ sudo_for_rule :: auto-generated pointer for public function sudo_for_rule
     pub fn sudo_for_rule(&self, command_config: &CommandConfig, rule: &Rule) -> SudoSpec {
         rule.action
             .as_ref()
@@ -179,20 +183,24 @@ impl Config {
 }
 
 impl CommandConfig {
+    // ⟦𓅠𓎼𓈧𓄗⟧ should_wrap :: auto-generated pointer for public function should_wrap
     pub fn should_wrap(&self) -> bool {
         self.wrap.unwrap_or(true)
     }
 
+    // ⟦𓋵𓂥𓇅𓈾⟧ always_sudo :: auto-generated pointer for public function always_sudo
     pub fn always_sudo(&self) -> bool {
         self.always_sudo
     }
 
+    // ⟦𓐘𓅨𓉐𓄯⟧ allow_pipes :: auto-generated pointer for public function allow_pipes
     pub fn allow_pipes(&self, defaults: &Defaults) -> bool {
         self.allow_pipes.or(defaults.allow_pipes).unwrap_or(false)
     }
 }
 
 impl PositionSpec {
+    // ⟦𓄐𓁸𓇤𓂹⟧ is_any :: auto-generated pointer for public function is_any
     pub fn is_any(&self) -> bool {
         matches!(self, PositionSpec::Any(value) if value == "any")
     }

@@ -21,6 +21,7 @@ struct Entry {
     metadata: String,
 }
 
+// ⟦𓐀𓆩𓎀𓅪⟧ render :: auto-generated pointer for public function render
 pub fn render(config: &Config, extra_commands: &[String]) -> Result<String, String> {
     let entries = collect_entries(config, extra_commands)?;
     let mut out = String::new();
@@ -46,6 +47,7 @@ pub fn render(config: &Config, extra_commands: &[String]) -> Result<String, Stri
     Ok(out)
 }
 
+// ⟦𓅿𓏸𓁤𓏔⟧ write_checked :: auto-generated pointer for public function write_checked
 pub fn write_checked(path: &Path, body: &str, append: bool) -> Result<(), String> {
     let parent = path
         .parent()
@@ -74,6 +76,7 @@ pub fn write_checked(path: &Path, body: &str, append: bool) -> Result<(), String
     Ok(())
 }
 
+// ⟦𓁉𓉱𓏍𓌱⟧ toggle :: auto-generated pointer for public function toggle
 pub fn toggle(path: &Path, entry_id: &str, enable: bool) -> Result<(), String> {
     let body = fs::read_to_string(path)
         .map_err(|err| format!("failed to read {}: {err}", path.display()))?;
@@ -107,6 +110,7 @@ pub fn toggle(path: &Path, entry_id: &str, enable: bool) -> Result<(), String> {
     fs::write(path, next).map_err(|err| format!("failed to write {}: {err}", path.display()))
 }
 
+// ⟦𓌧𓇁𓇁𓉠⟧ check_file :: auto-generated pointer for public function check_file
 pub fn check_file(path: &Path) -> Result<(), String> {
     let status = Command::new("visudo")
         .arg("-cf")

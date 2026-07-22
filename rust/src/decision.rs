@@ -16,6 +16,7 @@ pub struct Decision {
     pub reason: String,
 }
 
+// ⟦𓉸𓄞𓐢𓉭⟧ decide :: auto-generated pointer for public function decide
 pub fn decide(config: &Config, request: &DecisionRequest<'_>) -> Result<Decision, String> {
     let Some(command_config) = config.commands.get(request.command) else {
         return Ok(Decision {
