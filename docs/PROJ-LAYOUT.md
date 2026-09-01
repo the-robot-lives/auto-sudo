@@ -24,6 +24,7 @@ auto-sudo/
 │   └── faq/                #   per-topic FAQ pages (passwordless-sudo.md)
 ├── .gitignore              # editor swap files, .env, .envrc.local
 ├── CHANGELOG.md            # release history
+├── CLAUDE.md               # Claude Code guidance (commands, monorepo rules)
 ├── merge-notes.md          # notes from config refactor merge (data-driven rules)
 └── README.md               # Project description, install, and usage
 ```

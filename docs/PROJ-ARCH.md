@@ -48,6 +48,8 @@ writable directory never escalates.
 | `auto-sudo.zsh` | Small loader that evals generated zsh wrappers |
 | `config.example.yaml` | Default example preserving legacy behavior (YAML anchors shared rule bodies) |
 
+→ *Components ↔ directories: see [PROJ-LAYOUT.md](PROJ-LAYOUT.md)*
+
 ## Key Design Decisions
 
 - **CLI decides, shell executes**: `auto-sudo decide` only prints a prefix (`sudo `, `sudo -u <user> [-g <group>] `, or empty). It never executes the target command.

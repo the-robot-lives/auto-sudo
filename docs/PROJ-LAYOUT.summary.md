@@ -16,6 +16,7 @@ auto-sudo/
 ├── docs/                   # PROJ-ARCH/HOWTO/FAQ/LAYOUT (+ summaries); howto/, faq/ topic pages
 ├── .gitignore
 ├── CHANGELOG.md
+├── CLAUDE.md
 ├── merge-notes.md
 └── README.md
 ```
