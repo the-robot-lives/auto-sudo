@@ -13,7 +13,9 @@ auto-sudo/
 │       ├── decision.rs
 │       ├── shell.rs
 │       └── sudoers.rs
-├── docs/                   # PROJ-ARCH + PROJ-LAYOUT (+ summaries)
+├── docs/                   # PROJ-ARCH/HOWTO/FAQ/LAYOUT (+ summaries); howto/, faq/ topic pages
 ├── .gitignore
+├── CHANGELOG.md
+├── merge-notes.md
 └── README.md
 ```
