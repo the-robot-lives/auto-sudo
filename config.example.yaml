@@ -1,0 +1,397 @@
+# auto-sudo config.yaml
+#
+# Install location:
+#   ~/.config/auto-sudo/config.yaml
+#
+# Design notes:
+# - Pipes are denied globally. Commands that are naturally used in pipelines
+#   must opt in with allow_pipes: true.
+# - Set always_sudo: true on a command to make its generated function always
+#   run through sudo while still respecting allow_pipes.
+# - Rules are evaluated top to bottom per command. First match wins.
+# - A path-only file check intentionally means "sudo for this path".
+# - Use `auto-sudo decide --explain -- <command> ...` to see why a prefix was
+#   selected.
+
+version: 1
+
+defaults:
+  allow_pipes: false
+  sudo:
+    mode: root
+
+commands:
+  # ---------------------------------------------------------------------------
+  # Editors
+  # ---------------------------------------------------------------------------
+  # These sudo when editing protected config paths, existing unwritable files,
+  # unreadable files, or new files under unwritable directories.
+
+  vim: &editor_command
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: protected-config-path
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            paths:
+              - "/etc/*"
+              - "/usr/local/etc/*"
+              - "/opt/homebrew/etc/*"
+              - "/Library/LaunchDaemons/*"
+              - "/Library/LaunchAgents/*"
+              - "/private/etc/*"
+              - "/var/root/*"
+
+      - name: edit-existing-file-without-write-permission
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            exists_not_writable: true
+
+      - name: edit-existing-file-without-read-permission
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            current_user_cannot_read: true
+
+      - name: create-file-in-unwritable-directory
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-", "+"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  nvim: *editor_command
+  vi: *editor_command
+  nano: *editor_command
+  # Uncomment if installed:
+  # emacs: *editor_command
+
+  # Example: edit as a service account instead of root.
+  # psql-vim:
+  #   wrap: true
+  #   rules:
+  #     - name: edit-postgres-owned-files-as-postgres
+  #       action:
+  #         sudo:
+  #           mode: user
+  #           user: postgres
+  #           group: postgres
+  #       args:
+  #         files:
+  #           - position: any
+  #             skip_prefixes: ["-", "+"]
+  #       when:
+  #         any_file:
+  #           path_prefixes: ["/var/lib/postgresql/", "/usr/local/var/postgres/"]
+
+  # ---------------------------------------------------------------------------
+  # Ownership and mode tools
+  # ---------------------------------------------------------------------------
+
+  chmod:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: chmod-non-owned-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            owner_is_not_current_user: true
+
+      - name: chmod-protected-path
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/Library/*", "/var/root/*"]
+
+  chgrp:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: chgrp-non-owned-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            owner_is_not_current_user: true
+
+      - name: chgrp-target-group-not-current-user-group
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            group_not_in_current_user_groups: true
+
+  chown:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: chown-generally-requires-root
+        when:
+          always: true
+
+  # ---------------------------------------------------------------------------
+  # Write-through and file creation tools
+  # ---------------------------------------------------------------------------
+
+  tee:
+    wrap: true
+    allow_pipes: true
+    rules:
+      - name: tee-protected-path
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/etc/*", "/opt/homebrew/etc/*"]
+
+      - name: tee-existing-unwritable-file
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            exists_not_writable: true
+
+      - name: tee-new-file-in-unwritable-directory
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  touch:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: touch-protected-or-unwritable-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/etc/*", "/opt/homebrew/etc/*"]
+
+      - name: touch-existing-unwritable-file
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            exists_not_writable: true
+
+      - name: touch-new-file-in-unwritable-directory
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  mkdir:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: mkdir-protected-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/*", "/opt/homebrew/*", "/var/*"]
+
+      - name: mkdir-parent-not-writable
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  # ---------------------------------------------------------------------------
+  # Copy, move, and remove
+  # ---------------------------------------------------------------------------
+  # These stay permission-gated. `rm` is intentionally not "always sudo".
+
+  cp: &write_file_command
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: protected-path-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/etc/*", "/opt/homebrew/etc/*"]
+
+      - name: target-exists-and-is-not-writable
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            exists_not_writable: true
+
+      - name: target-parent-is-not-writable
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  mv: *write_file_command
+  install: *write_file_command
+
+  rm:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: remove-non-owned-target
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            owner_is_not_current_user: true
+
+      - name: remove-protected-path
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/etc/*", "/opt/homebrew/etc/*"]
+
+  ln:
+    wrap: true
+    allow_pipes: false
+    rules:
+      - name: link-into-protected-or-unwritable-location
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            paths: ["/etc/*", "/private/etc/*", "/usr/local/*", "/opt/homebrew/*"]
+
+      - name: link-parent-not-writable
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            missing_parent_not_writable: true
+
+  # ---------------------------------------------------------------------------
+  # Log and protected-file readers
+  # ---------------------------------------------------------------------------
+
+  cat: &read_file_command
+    wrap: true
+    allow_pipes: true
+    rules:
+      - name: read-protected-or-unreadable-file
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            current_user_cannot_read: true
+
+      - name: read-root-logs
+        args:
+          files:
+            - position: any
+              skip_prefixes: ["-"]
+        when:
+          any_file:
+            path_prefixes:
+              - "/var/log/"
+              - "/private/var/log/"
+              - "/var/root/"
+              - "/Users/root/"
+
+  bat: *read_file_command
+  less: *read_file_command
+  more: *read_file_command
+  tail: *read_file_command
+  head: *read_file_command
+
+  # ---------------------------------------------------------------------------
+  # Service and package managers
+  # ---------------------------------------------------------------------------
+  # These commands are normally administrative. Only commands commonly present
+  # on this machine are active so `auto-sudo sudoers print` can resolve every
+  # configured executable.
+
+  launchctl: &admin_command
+    wrap: true
+    allow_pipes: false
+    always_sudo: true
+
+  dscacheutil: *admin_command
+  # Uncomment if the executable is readable by the current user or you run
+  # sudoers generation with enough permission to checksum it.
+  # visudo: *admin_command
+
+  # Linux/package-manager examples. Uncomment only when the command exists on
+  # the host; sudoers generation resolves all configured executable paths.
+  # systemctl: *admin_command
+  # service: *admin_command
+  # apt: *admin_command
+  # apt-get: *admin_command
+  # dnf: *admin_command
+  # yum: *admin_command
+  # pacman: *admin_command
+  # apk: *admin_command
+  # zypper: *admin_command
+  # port: *admin_command
+
+  # Homebrew itself usually should not run as root, so keep brew unwrapped.
+  brew:
+    wrap: false
+    rules: []

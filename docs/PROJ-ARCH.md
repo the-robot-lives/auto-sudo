@@ -1,33 +1,68 @@
-# Architecture — auto-sudo
+# Architecture - auto-sudo
 
 ## Overview
 
-auto-sudo is a collection of **zsh function shims** that transparently elevate commands with `sudo` when the current user lacks write permission to target files or directories. Each shim wraps a standard command (e.g., `vim`) and is sourced into the user's shell profile.
+auto-sudo is a Rust CLI that generates shell wrappers and decides whether a
+command should be prefixed with `sudo` based on YAML rules or command-level
+`always_sudo` settings. The wrapper calls `auto-sudo decide`, receives a prefix,
+prints a yellow notice when sudo will be used, then invokes the real command.
 
 ## Design
 
 ```mermaid
 flowchart TD
-    A[User invokes vim file.conf] --> B{File args present?}
-    B -- No --> C[Passthrough to real vim]
-    B -- Yes --> D{User has write permission?}
-    D -- Yes --> C
-    D -- No --> E[Print notice + sudo vim]
+    A[User invokes wrapped command] --> B[Shell wrapper detects pipe context]
+    B --> C[auto-sudo decide loads config.yaml]
+    C --> D{Matching rule?}
+    D -- No --> E[Return empty prefix]
+    D -- Yes --> F{Pipes allowed?}
+    F -- No --> E
+    F -- Yes --> G[Return sudo prefix]
+    E --> H[Wrapper runs command normally]
+    G --> I[Wrapper runs sudo-prefixed command]
 ```
 
 ## Components
 
 | Component | Purpose |
 |-----------|---------|
-| `vim.zsh` | Zsh function that wraps `vim` with write-permission detection |
+| `rust/src/main.rs` | CLI entrypoint and subcommands |
+| `rust/src/config.rs` | YAML config model and default path resolution |
+| `rust/src/decision.rs` | Rule matching, argument extraction, permission checks |
+| `rust/src/shell.rs` | Bash/zsh wrapper generation |
+| `rust/src/sudoers.rs` | sudoers snippet generation, toggling, refresh, validation |
+| `auto-sudo.zsh` | Small loader that evals generated zsh wrappers |
+| `config.example.yaml` | Default example preserving legacy behavior |
 
 ## Key Design Decisions
 
-- **Zsh function over alias/script**: Functions can shadow commands in the current shell without spawning a subprocess; `command vim` bypasses the shim to call the real binary.
-- **Check files, not flags**: Only positional file arguments are inspected — flags (`-x`, `+x`) are skipped to avoid false positives on option values.
-- **Existing vs. new files**: Existing files check `-w` on the file itself; new files check `-w` on the parent directory.
-- **Visual feedback**: A colored `⚡ auto-sudo vim` banner prints before elevation so the user knows sudo is in effect.
+- **CLI decides, shell executes**: `auto-sudo decide` only prints a prefix. It never executes the target command.
+- **Config-driven behavior**: Commands, command-level always-sudo behavior, file arguments, flags, pipe policy, and sudo target users are YAML data.
+- **Fail closed on config errors**: Wrapper generation and decision calls return non-zero if config cannot be parsed.
+- **Pipes denied by default**: `allow_pipes` must be enabled globally or per command to auto-sudo in pipelines.
+- **sudoers writes are explicit**: Snippets print by default; writes require an explicit `sudoers write` or `refresh`.
+
+## Install Model
+
+`make install` compiles the Rust crate (`cargo build --release`), copies the
+binary to `~/.local/bin/auto-sudo`, installs the zsh loader to
+`~/.local/share/auto-sudo/`, seeds `~/.config/auto-sudo/config.yaml` from
+`config.example.yaml` (never overwriting an existing config), and appends a
+source line to `~/.zshrc` if absent.
+
+## Ecosystem Fit
+
+auto-sudo lives under `utilities/shell/` in the Noizu Infra monorepo but is a
+standalone Rust project, not a shell script: it has its own `Makefile` and is
+installed directly via `make install` in this directory rather than through the
+repo-root `make install-utilities` flow. It does not source `share/k8-lib/` and
+reads no `.infra-config.yaml` — its only configuration surface is
+`~/.config/auto-sudo/config.yaml`. It shares the ecosystem convention of
+installing user tooling into `~/.local/bin`.
 
 ## Extensibility
 
-The same pattern can be applied to other commands (e.g., `nano`, `less`, `cat`) by duplicating the function structure and changing the wrapped command name.
+Add commands and rules to `~/.config/auto-sudo/config.yaml`. Supported file
+argument selectors include positional indexes, `position: any`, `--flag=value`,
+and `--flag value`. File checks can match permission state, ownership, group
+membership, exact/wildcard paths, prefixes, and suffixes.

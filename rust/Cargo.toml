@@ -1,0 +1,21 @@
+[package]
+name = "auto-sudo"
+version = "0.1.0"
+edition = "2021"
+description = "YAML-configurable sudo prefix helper for shell command wrappers"
+license = "MIT"
+
+[dependencies]
+base64 = "0.22"
+clap = { version = "4", features = ["derive"] }
+dirs = "6"
+libc = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+sha2 = "0.10"
+which = "6"
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "z"
