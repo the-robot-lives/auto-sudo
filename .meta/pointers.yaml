@@ -1,0 +1,90 @@
+---
+pointers:
+  3ae1655c-b5b4-51fb-9128-9fc1c22d355f:
+    created_at: 2026-09-14T20:42:45.989678Z
+    description: auto-generated pointer for public function toggle
+    file_path: rust/src/sudoers.rs
+    function: toggle
+    line: 79
+    token: 𓁉𓉱𓏍𓌱
+    updated_at: 2026-09-14T20:42:45.989678Z
+  52d37124-8df5-534a-9afa-03c6fdcf24d2:
+    created_at: 2026-09-14T20:42:45.984699Z
+    description: auto-generated pointer for public function allow_pipes
+    file_path: rust/src/config.rs
+    function: allow_pipes
+    line: 196
+    token: 𓐘𓅨𓉐𓄯
+    updated_at: 2026-09-14T20:42:45.984699Z
+  6f765c78-f0d6-5fa7-a0e8-9207aa464ea5:
+    created_at: 2026-09-14T20:42:45.982950Z
+    description: auto-generated pointer for public function sudo_for_command
+    file_path: rust/src/config.rs
+    function: sudo_for_command
+    line: 165
+    token: 𓍒𓆳𓍝𓌄
+    updated_at: 2026-09-14T20:42:45.982950Z
+  70f9ca10-d9e9-57db-b9cc-ee6755f748a2:
+    created_at: 2026-09-14T20:42:45.988494Z
+    description: auto-generated pointer for public function should_wrap
+    file_path: rust/src/config.rs
+    function: should_wrap
+    line: 186
+    token: 𓅠𓎼𓈧𓄗
+    updated_at: 2026-09-14T20:42:45.988494Z
+  74c21b68-5671-5fad-9e94-a468e1d1234c:
+    created_at: 2026-09-14T20:42:45.979205Z
+    description: auto-generated pointer for public function default_path
+    file_path: rust/src/config.rs
+    function: default_path
+    line: 146
+    token: 𓄈𓄚𓋅𓅎
+    updated_at: 2026-09-14T20:42:45.979205Z
+  9c3515cc-eb08-5463-afd8-e21a10da1d4d:
+    created_at: 2026-09-14T20:42:45.977399Z
+    description: auto-generated pointer for public function write_checked
+    file_path: rust/src/sudoers.rs
+    function: write_checked
+    line: 50
+    token: 𓅿𓏸𓁤𓏔
+    updated_at: 2026-09-14T20:42:45.977399Z
+  cca8132e-de38-5911-ac48-981fbcf32d73:
+    created_at: 2026-09-14T20:42:45.975340Z
+    description: auto-generated pointer for public function decide
+    file_path: rust/src/decision.rs
+    function: decide
+    line: 19
+    token: 𓉸𓄞𓐢𓉭
+    updated_at: 2026-09-14T20:42:45.975340Z
+  e4516c65-2065-59b3-89e3-d28359beeee0:
+    created_at: 2026-09-14T20:42:45.972474Z
+    description: auto-generated pointer for public function check_file
+    file_path: rust/src/sudoers.rs
+    function: check_file
+    line: 113
+    token: 𓌧𓇁𓇁𓉠
+    updated_at: 2026-09-14T20:42:45.972474Z
+  ea636dbc-54da-5c12-9123-7579f4cdc1be:
+    created_at: 2026-09-14T20:42:45.987258Z
+    description: auto-generated pointer for public function sudo_for_rule
+    file_path: rust/src/config.rs
+    function: sudo_for_rule
+    line: 174
+    token: 𓊵𓌶𓅲𓆚
+    updated_at: 2026-09-14T20:42:45.987258Z
+  f0ccc4b8-aa69-5ba5-8657-17c717d152d8:
+    created_at: 2026-09-14T20:42:45.972085Z
+    description: auto-generated pointer for public function is_any
+    file_path: rust/src/config.rs
+    function: is_any
+    line: 203
+    token: 𓄐𓁸𓇤𓂹
+    updated_at: 2026-09-14T20:42:45.972085Z
+  f68d771c-db18-51e9-8087-1071af17629c:
+    created_at: 2026-09-14T20:42:45.984310Z
+    description: auto-generated pointer for public function always_sudo
+    file_path: rust/src/config.rs
+    function: always_sudo
+    line: 191
+    token: 𓋵𓂥𓇅𓈾
+    updated_at: 2026-09-14T20:42:45.984310Z
