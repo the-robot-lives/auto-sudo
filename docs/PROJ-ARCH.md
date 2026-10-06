@@ -70,14 +70,14 @@ source line to `~/.zshrc` if absent.
 
 ## Ecosystem Fit
 
-auto-sudo lives in the Noizu Infra monorepo as a git submodule with a dual
-path — `Portfolio/Utilities/source/auto-sudo` (source) and `utilities/` (the
-install-oriented mirror) — but is a standalone Rust project, not a shell
-script: it has its own `Makefile` and is installed directly via `make install`
-in this directory rather than through the repo-root `make install-utilities`
-flow. It does not source `share/k8-lib/` and reads no `.infra-config.yaml` —
-its only configuration surface is `~/.config/auto-sudo/config.yaml`. It shares
-the ecosystem convention of installing user tooling into `~/.local/bin`.
+auto-sudo lives in the Noizu Infra monorepo as a git submodule at
+`Portfolio/Utilities/source/auto-sudo` and is registered in the
+`SHELL_PACKAGES` list of `Portfolio/Utilities/Makefile`, so the repo-root
+`make install-utilities` flow installs it (delegating to this repo's own
+`make install`). It is a standalone Rust project, not a shell script. It does
+not source `share/k8-lib/` and reads no `.infra-config.yaml` — its only
+configuration surface is `~/.config/auto-sudo/config.yaml`. It shares the
+ecosystem convention of installing user tooling into `~/.local/bin`.
 
 ## Extensibility
 

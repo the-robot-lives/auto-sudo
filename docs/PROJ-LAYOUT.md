@@ -18,6 +18,7 @@ auto-sudo/
 ├── docs/                   # Documentation
 │   ├── PROJ-ARCH.md        #   architecture doc (+ .summary.md)
 │   ├── PROJ-LAYOUT.md      #   this file (+ .summary.md)
+│   ├── PROJ-SCHEMA.md      #   config schema reference (+ .summary.md)
 │   ├── PROJ-HOWTO.md       #   usage howto (+ .summary.md)
 │   ├── PROJ-FAQ.md         #   FAQ (+ .summary.md)
 │   ├── howto/              #   per-topic howtos (passwordless-sudo.md)
@@ -25,6 +26,8 @@ auto-sudo/
 ├── .gitignore              # editor swap files, .env, .envrc.local
 ├── CHANGELOG.md            # release history
 ├── CLAUDE.md               # Claude Code guidance (commands, monorepo rules)
+├── AGENT.md                # agent guidance (mirror of CLAUDE.md)
+├── AGENTS.md               # multi-agent build rules (kept aligned with AGENT.md)
 ├── merge-notes.md          # notes from config refactor merge (data-driven rules)
 └── README.md               # Project description, install, and usage
 ```
