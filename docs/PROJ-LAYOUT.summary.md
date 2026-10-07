@@ -13,10 +13,12 @@ auto-sudo/
 │       ├── decision.rs
 │       ├── shell.rs
 │       └── sudoers.rs
-├── docs/                   # PROJ-ARCH/HOWTO/FAQ/LAYOUT (+ summaries); howto/, faq/ topic pages
+├── docs/                   # PROJ-ARCH/SCHEMA/HOWTO/FAQ/LAYOUT (+ summaries); howto/, faq/ topic pages
 ├── .gitignore
 ├── CHANGELOG.md
 ├── CLAUDE.md
+├── AGENT.md
+├── AGENTS.md
 ├── merge-notes.md
 └── README.md
 ```
