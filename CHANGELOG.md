@@ -3,6 +3,9 @@
 ## [Unreleased]
 - Refreshed PROJ-ARCH.md / PROJ-LAYOUT.md (+ summaries) to reflect current module layout
 
+## 2026-10-26
+- Seeded `.meta/pointers.yaml` (10 typed doc-pointer markers, full-UUID form) and cleared the `<REMOVED UUID HERE>` placeholders left by #3 (#5); refreshed PROJ-LAYOUT / PROJ-ARCH / PROJ-SCHEMA / THREAT-MODEL (+ summaries) — THREAT-MODEL gains T-007 (unvalidated `toggle` write) and T-008 (`with_extension` staging path) and T-003 notes `$USER` spoofing; schema summary FileChecks count corrected 17 → 15.
+
 ## [m3-missing-file-semantics] — 2026-07-07 — tag: `utilities-shell-auto-sudo/m3-missing-file-semantics`
 Milestone summary: fixed a false-positive escalation where operating on a not-yet-created file (e.g. `vim /tmp/new-note.txt`) was misread as a permission-denied case and triggered `sudo`.
 

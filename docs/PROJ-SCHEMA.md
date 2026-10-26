@@ -98,9 +98,11 @@ All default `false`; empty-string filters (`paths`, `path_prefixes`,
 | `owner_is_current_user` / `owner_is_not_current_user` | uid comparison |
 | `group_in_current_user_groups` / `group_not_in_current_user_groups` | gid membership |
 
-Config convention: `config.example.yaml` uses **YAML anchors** (`&editor_command`,
-`*write_file_command`) to share rule bodies across commands; `brew` ships
-`wrap: false`.
+Config convention: `config.example.yaml` uses **YAML anchors** to share rule
+bodies across commands — `&editor_command` (vim/nvim/vi/nano),
+`&write_file_command` (cp/mv/install), `&read_file_command`
+(cat/bat/less/more/tail/head), `&admin_command` (launchctl/dscacheutil); `brew`
+ships `wrap: false`.
 
 ## sudoers.d snippet (generated)
 
@@ -133,7 +135,10 @@ validation hint.
 
 **Write semantics**: default replaces the file; `--append` joins with existing
 content (`trim_end` + `\n`). Both paths validate the temp file with
-`visudo -cf` before the atomic rename.
+`visudo -cf` before the atomic rename. `toggle` does **not** follow that path —
+it reads the file, flips the `# ` prefix on the selected entry's rule line, and
+rewrites the file in place with `fs::write` (no `visudo` validation, not
+atomic; see T-007 in [THREAT-MODEL.md](THREAT-MODEL.md)).
 
 ## Generated shell wrappers
 

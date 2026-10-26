@@ -3,8 +3,10 @@
 ```
 auto-sudo/
 ├── auto-sudo.zsh           # zsh loader — evals `auto-sudo shell --shell zsh`
-├── config.example.yaml     # default YAML rules (editors, chmod/chown/chgrp, tee, cp/mv, readers, launchctl)
+├── config.example.yaml     # default YAML rules (editors, chmod/chgrp/chown, tee, touch, mkdir, cp/mv/install, rm, ln, readers, launchctl/dscacheutil; brew unwrapped)
 ├── Makefile                # compile/test/install targets (→ ~/.local/bin, ~/.local/share/auto-sudo, ~/.config/auto-sudo)
+├── .meta/
+│   └── pointers.yaml       # doc-pointer store (10 UUID-keyed records; written by `doc-pointers build --write`)
 ├── rust/                   # Rust CLI crate (auto-sudo binary)
 │   ├── Cargo.toml          #   crate manifest (clap, serde_yaml, sha2, base64, which, dirs)
 │   ├── Cargo.lock          #   pinned dependency versions
@@ -21,13 +23,14 @@ auto-sudo/
 │   ├── PROJ-SCHEMA.md      #   config schema reference (+ .summary.md)
 │   ├── PROJ-HOWTO.md       #   usage howto (+ .summary.md)
 │   ├── PROJ-FAQ.md         #   FAQ (+ .summary.md)
+│   ├── THREAT-MODEL.md     #   threat model — trust boundaries, vuln register (+ .summary.md)
 │   ├── howto/              #   per-topic howtos (passwordless-sudo.md)
 │   └── faq/                #   per-topic FAQ pages (passwordless-sudo.md)
-├── .gitignore              # editor swap files, .env, .envrc.local
+├── .gitignore              # .DS_Store, editor swap files, .env, .envrc.local, .claude/worktrees/
 ├── CHANGELOG.md            # release history
 ├── CLAUDE.md               # Claude Code guidance (commands, monorepo rules)
-├── AGENT.md                # agent guidance (mirror of CLAUDE.md)
-├── AGENTS.md               # multi-agent build rules (kept aligned with AGENT.md)
+├── AGENT.md                # Codex/Grok/Cursor guidance — harness-shaped sibling of CLAUDE.md
+├── AGENTS.md               # multi-agent build rules (kept aligned with AGENT.md, not byte-identical)
 ├── merge-notes.md          # notes from config refactor merge (data-driven rules)
 └── README.md               # Project description, install, and usage
 ```
@@ -45,6 +48,7 @@ auto-sudo/
 | `config.example.yaml` | Starter ruleset (data-driven rules with YAML anchors) |
 | `Makefile` | `make install` = build + install binary, loader, default config, zshrc line |
 | `docs/PROJ-ARCH.md` | Architecture (decision engine, generators) |
+| `docs/THREAT-MODEL.md` | Threat model: trust boundaries, vulnerability register, mitigations |
 | `docs/PROJ-HOWTO.md` | How to configure and operate |
 | `docs/PROJ-FAQ.md` | FAQ; `docs/faq/`, `docs/howto/` for per-topic pages |
 | `README.md` | Describes the auto-sudo concept and commands |

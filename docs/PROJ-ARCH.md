@@ -34,7 +34,8 @@ access checks (`current_user_cannot_*`) — only parent-directory checks
 (`missing_parent_not_*`) can match a non-existent path, so creating a file in a
 writable directory never escalates.
 
-→ *File-format details live in [PROJ-SCHEMA.md](PROJ-SCHEMA.md)*
+→ *File-format details live in [PROJ-SCHEMA.md](PROJ-SCHEMA.md); what can go
+wrong across the user ↔ root boundary lives in [THREAT-MODEL.md](THREAT-MODEL.md)*
 
 ## Components
 
@@ -57,7 +58,11 @@ writable directory never escalates.
 - **Fail closed on config errors**: Wrapper generation and decision calls return non-zero if config cannot be parsed.
 - **Pipes denied by default**: `allow_pipes` must be enabled globally or per command to auto-sudo in pipelines — even `always_sudo` commands stay un-sudoed when piped.
 - **Checksum-pinned sudoers**: generated `NOPASSWD:` lines carry a `sha256:<base64>` digest constraint (sudoers digest syntax) plus an `# AUTO-SUDO ENTRY id=...` header used by `toggle` to comment/uncomment individual entries.
-- **sudoers writes are explicit and validated**: snippets print by default; `write`/`refresh` go through a temp file, `visudo -cf` validation, and atomic rename. `--append` merges with existing content; `toggle` comments entries in place.
+- **sudoers writes are explicit and validated**: snippets print by default;
+  `write`/`refresh` go through a temp file, `visudo -cf` validation, and atomic
+  rename. `--append` merges with existing content. `toggle` is the exception:
+  it rewrites the file in place with `fs::write`, unvalidated and non-atomic
+  (see T-007 in [THREAT-MODEL.md](THREAT-MODEL.md)).
 - **Missing ≠ unreadable**: a non-existent file in a writable directory is treated as creatable by the user, so read/edit rules do not escalate for it (prevents spurious sudo for `cat /tmp/new-file`).
 
 ## Install Model

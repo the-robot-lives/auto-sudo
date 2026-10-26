@@ -30,7 +30,7 @@ flowchart TD
 
 - Rule evaluation: top to bottom, **first match wins**; `always_sudo` bypasses rules but still respects pipe policy.
 - SudoSpec resolution: rule → command → defaults → root.
-- FileChecks: 17 boolean flags + 3 path-filter lists (wildcard `paths`, prefixes, suffixes).
+- FileChecks: 15 boolean flags + 3 path-filter lists (wildcard `paths`, prefixes, suffixes).
 
 ## sudoers entry grammar
 
@@ -41,7 +41,7 @@ flowchart TD
 
 - `id` = sanitized command + target (`root` or sudo user); dedupe key.
 - Toggle `--off` comments the rule line (`# ` prefix); `--on` uncomments.
-- Writes validated with `visudo -cf` before atomic rename; `--append` vs replace.
+- Writes validated with `visudo -cf` before atomic rename; `--append` vs replace. `toggle` writes in place, unvalidated/non-atomic (T-007).
 
 ## CLI
 

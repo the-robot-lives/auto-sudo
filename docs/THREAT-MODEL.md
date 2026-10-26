@@ -43,6 +43,8 @@ All ingress is local: config file, argv, environment (`$USER`), and PATH.
 | T-004 | Low | Tampering | decide → exec race | Accepted |
 | T-005 | Low | Spoofing | PATH resolution | Mitigated (checksums) |
 | T-006 | Low | Info disclosure | wrapper notice | Accepted |
+| T-007 | Medium | Tampering | `sudoers toggle` | Open (hardening) |
+| T-008 | Low | Tampering | temp path in `write_checked` | Open (hardening) |
 
 ### T-001 — NOPASSWD grants are argument-unconstrained
 
@@ -70,7 +72,11 @@ from an environment without `USER` (cron, launchd, some CI shells) produces
 entries granting **every local user** NOPASSWD access to the pinned binaries.
 **Open**: hardening would error (or require an explicit `--subject`) instead
 of silently widening. Interim mitigation: never run `sudoers write` from
-contexts that strip `USER`.
+contexts that strip `USER`. Note the value is read from the environment, so it
+is also *spoofable*, not just absent: `USER=someone-else sudo auto-sudo sudoers
+write` writes the grant for that account instead of the invoking user — still a
+root-authored file in `/etc/sudoers.d/`, so it grants the named account the
+pinned binaries (no wider than T-001, but it misattributes the subject).
 
 ### T-004 — TOCTOU between decide and execution
 
@@ -93,13 +99,37 @@ The yellow `Auto Sudo <cmd> <args>` notice writes the full argument list to
 stderr, which may embed tokens passed on the command line. **Accepted**:
 notice is the deliberate consent signal; stderr of the user's own terminal.
 
+### T-007 — `toggle` rewrites the sudoers file unvalidated and non-atomically
+
+`sudoers toggle` (`rust/src/sudoers.rs`) reads the file, flips the `# ` prefix
+on the selected entry's rule line, and writes the whole body back with
+`fs::write` — it never calls `check_file`, and it is not the temp-file +
+`visudo -cf` + rename path that `write`/`refresh` use. A malformed result (or
+an interrupted write) lands in `/etc/sudoers.d/`, and sudo treats a syntax
+error in an `@includedir` file as **fatal**, so the host loses `sudo` entirely
+until the file is repaired by hand. **Open**: hardening is to route `toggle`
+through `check_file` + the same atomic-replace helper as `write_checked`.
+
+### T-008 — Temp path derived via `with_extension("tmp")`
+
+`write_checked` builds its staging path with `path.with_extension("tmp")`. For
+the default target (`/etc/sudoers.d/auto-sudo`, no extension) that yields
+`auto-sudo.tmp`; for a `--file` value that carries an extension it *replaces*
+that extension (`auto-sudo.conf` → `auto-sudo.tmp`), so two different targets
+in one directory share a staging name and an existing `*.tmp` file can be
+overwritten before the rename. Separately, sudo's `@includedir` skips file
+names containing a `.`, so a target such as `auto-sudo.conf` is written but
+**never read by sudo** — the grant silently does nothing (fails closed, but is
+confusing). **Open**: append a suffix (`.tmp`) instead of replacing the
+extension, and reject targets whose name would be ignored by `@includedir`.
+
 ## Mitigation Coverage
 
-2 mitigated · 2 partial · 1 open (T-003) · 3 accepted residuals.
+2 mitigated · 2 partial · 3 open (T-003, T-007, T-008) · 3 accepted residuals.
 
 | Mitigation | Covers | Where |
 |------------|--------|-------|
-| `visudo -cf` validation + atomic rename before any write/append | corrupt/arbitrary sudoers writes, self-lockout | `sudoers.rs::write_checked` |
+| `visudo -cf` validation + atomic rename before any write/append (`write`/`refresh` only — `toggle` bypasses it, T-007) | corrupt/arbitrary sudoers writes, self-lockout | `sudoers.rs::write_checked` |
 | sha256 digest constraint on every `NOPASSWD` line | binary replacement/swap (T-005) | `sudoers.rs::checksum` |
 | `shell_word()` quoting of user/group in the rendered prefix | shell injection via config into the wrapper's `eval` | `decision.rs::render_prefix` |
 | Missing ≠ unreadable file semantics | spurious escalation for creatable files | `decision.rs` |
@@ -109,5 +139,7 @@ notice is the deliberate consent signal; stderr of the user's own terminal.
 
 Passwordless sudo for pinned binaries with unrestricted args (T-001) is the
 core design trade-off: convenience over an authentication prompt, on a
-single-admin workstation. The open item worth fixing before any multi-user
-use is T-003; on a shared host, T-001 and T-003 together would be disqualifying.
+single-admin workstation. The open items worth fixing before any multi-user
+use are T-003 (subject widening/spoofing) and T-007 (unvalidated `toggle`
+write can break sudo host-wide); on a shared host, T-001 and T-003 together
+would be disqualifying.
