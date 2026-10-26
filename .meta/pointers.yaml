@@ -1,0 +1,122 @@
+---
+pointers:
+  12404d62-5e4e-59d5-80aa-0a3238ae5ce3:
+    created_at: 2026-10-26T21:27:31.024479Z
+    description: 'toggle :: Comment/uncomment a managed entry by id.'
+    file_path: rust/src/sudoers.rs
+    function: sudoers
+    kind: function
+    line: 79
+    locations:
+      - file_path: rust/src/sudoers.rs
+        line: 79
+    token: 𔕘𓋴𓊣𔆣
+    updated_at: 2026-10-26T21:27:31.024479Z
+  15964c5d-6716-5f45-8d3d-2fce8e7d3ac1:
+    created_at: 2026-10-26T21:27:31.024450Z
+    description: 'render :: Emit zsh/bash wrapper functions for wrap-enabled commands.'
+    file_path: rust/src/shell.rs
+    function: shell
+    kind: function
+    line: 9
+    locations:
+      - file_path: rust/src/shell.rs
+        line: 9
+    token: 𓡯𓺠𓅥𓉱
+    updated_at: 2026-10-26T21:27:31.024450Z
+  19bfc0b1-5f1c-5bcb-9012-6425c3d158c4:
+    created_at: 2026-10-26T21:27:31.024475Z
+    description: 'write_checked :: Temp file + visudo -cf validation + atomic rename.'
+    file_path: rust/src/sudoers.rs
+    function: sudoers
+    kind: function
+    line: 50
+    locations:
+      - file_path: rust/src/sudoers.rs
+        line: 50
+    token: 𔔜𓷧𓖍𓴤
+    updated_at: 2026-10-26T21:27:31.024475Z
+  4083ca81-e464-586b-b55e-0980574143a9:
+    created_at: 2026-10-26T21:27:31.024460Z
+    description: 'render :: Build checksum-pinned NOPASSWD entries from config.'
+    file_path: rust/src/sudoers.rs
+    function: sudoers
+    kind: function
+    line: 24
+    locations:
+      - file_path: rust/src/sudoers.rs
+        line: 24
+    token: 𓦯𔂙𓍑𓌙
+    updated_at: 2026-10-26T21:27:31.024460Z
+  7d16c4bc-3b96-5a78-898f-eb6dd7f81309:
+    created_at: 2026-10-26T21:27:31.024440Z
+    description: 'checksum :: sha256:<base64> digest used as the sudoers flag constraint.'
+    file_path: rust/src/sudoers.rs
+    function: sudoers
+    kind: function
+    line: 188
+    locations:
+      - file_path: rust/src/sudoers.rs
+        line: 188
+    token: 𓐮𓸀𓫙𓔩
+    updated_at: 2026-10-26T21:27:31.024440Z
+  7e7c937c-1c42-5c10-88cc-d948d6669f68:
+    created_at: 2026-10-26T21:27:31.024464Z
+    description: CLI entrypoint — clap subcommands decide / shell / sudoers.
+    file_path: rust/src/main.rs
+    function: main.rs
+    kind: file
+    line: 1
+    locations:
+      - file_path: rust/src/main.rs
+        line: 1
+    token: 𓾗𓛍𔕟𓗨
+    updated_at: 2026-10-26T21:27:31.024464Z
+  b60a60ec-b000-5ceb-8b1f-3adfb4e4a7ec:
+    created_at: 2026-10-26T21:27:31.024471Z
+    description: Example rule set — anchors shared rule bodies across commands.
+    file_path: config.example.yaml
+    function: config.example.yaml
+    kind: file
+    line: 3
+    locations:
+      - file_path: config.example.yaml
+        line: 3
+    token: 𔅈𓻷𓷮𓯜
+    updated_at: 2026-10-26T21:27:31.024471Z
+  ca1c3b0a-96ad-5268-a766-a4c350d8d733:
+    created_at: 2026-10-26T21:27:31.024468Z
+    description: 'load :: Default config path resolution plus serde_yaml parse.'
+    file_path: rust/src/config.rs
+    function: Config
+    kind: function
+    line: 152
+    locations:
+      - file_path: rust/src/config.rs
+        line: 152
+    token: 𔂹𓄥𔓥𓜓
+    updated_at: 2026-10-26T21:27:31.024468Z
+  e259ce96-61ab-5442-aec3-c8b1324de9f7:
+    created_at: 2026-10-26T21:27:31.024446Z
+    description: Rule matching + prefix render — pipe policy, always_sudo, then first matching rule.
+    file_path: rust/src/decision.rs
+    function: decide
+    kind: function
+    line: 19
+    locations:
+      - file_path: rust/src/decision.rs
+        line: 19
+    token: 𓝙𓙇𓨟𓉇
+    updated_at: 2026-10-26T21:27:31.024446Z
+  f30274f5-eb1a-553b-b80d-0bc2f4c8d374:
+    created_at: 2026-10-26T21:27:31.024416Z
+    description: Project overview — why, install, commands, rule model.
+    file_path: README.md
+    function: README.md
+    kind: file
+    line: 3
+    locations:
+      - file_path: README.md
+        line: 3
+    token: 𓀬𓁫𓉡𓨔
+    updated_at: 2026-10-26T21:27:31.024416Z

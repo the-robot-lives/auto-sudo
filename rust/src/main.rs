@@ -1,3 +1,4 @@
+// 〚📁:7e7c937c-1c42-5c10-88cc-d948d6669f68〛 main.rs :: CLI entrypoint — clap subcommands decide / shell / sudoers.
 mod config;
 mod decision;
 mod shell;

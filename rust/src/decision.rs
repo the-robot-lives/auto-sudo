@@ -16,7 +16,7 @@ pub struct Decision {
     pub reason: String,
 }
 
-// <REMOVED UUID HERE> decide :: auto-generated pointer for public function decide
+// 〚🔧:e259ce96-61ab-5442-aec3-c8b1324de9f7〛 decide :: Rule matching + prefix render — pipe policy, always_sudo, then first matching rule.
 pub fn decide(config: &Config, request: &DecisionRequest<'_>) -> Result<Decision, String> {
     let Some(command_config) = config.commands.get(request.command) else {
         return Ok(Decision {

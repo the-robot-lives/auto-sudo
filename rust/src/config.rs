@@ -143,14 +143,13 @@ impl Default for SudoSpec {
 }
 
 impl Config {
-    // <REMOVED UUID HERE> default_path :: auto-generated pointer for public function default_path
-    pub fn default_path() -> Result<PathBuf, String> {
+        pub fn default_path() -> Result<PathBuf, String> {
         dirs::home_dir()
             .map(|home| home.join(".config/auto-sudo/config.yaml"))
             .ok_or_else(|| "could not resolve home directory".to_string())
     }
 
-    // <REMOVED UUID HERE> load :: auto-generated pointer for public function load
+    // 〚🔧:ca1c3b0a-96ad-5268-a766-a4c350d8d733〛 Config::load :: Default config path resolution plus serde_yaml parse.
     pub fn load(path: Option<&Path>) -> Result<Self, String> {
         let path = match path {
             Some(path) => path.to_path_buf(),
@@ -162,8 +161,7 @@ impl Config {
             .map_err(|err| format!("failed to parse {}: {err}", path.display()))
     }
 
-    // <REMOVED UUID HERE> sudo_for_command :: auto-generated pointer for public function sudo_for_command
-    pub fn sudo_for_command(&self, command_config: &CommandConfig) -> SudoSpec {
+        pub fn sudo_for_command(&self, command_config: &CommandConfig) -> SudoSpec {
         command_config
             .sudo
             .clone()
@@ -171,8 +169,7 @@ impl Config {
             .unwrap_or_default()
     }
 
-    // <REMOVED UUID HERE> sudo_for_rule :: auto-generated pointer for public function sudo_for_rule
-    pub fn sudo_for_rule(&self, command_config: &CommandConfig, rule: &Rule) -> SudoSpec {
+        pub fn sudo_for_rule(&self, command_config: &CommandConfig, rule: &Rule) -> SudoSpec {
         rule.action
             .as_ref()
             .map(|action| action.sudo.clone())
@@ -183,25 +180,21 @@ impl Config {
 }
 
 impl CommandConfig {
-    // <REMOVED UUID HERE> should_wrap :: auto-generated pointer for public function should_wrap
-    pub fn should_wrap(&self) -> bool {
+        pub fn should_wrap(&self) -> bool {
         self.wrap.unwrap_or(true)
     }
 
-    // <REMOVED UUID HERE> always_sudo :: auto-generated pointer for public function always_sudo
-    pub fn always_sudo(&self) -> bool {
+        pub fn always_sudo(&self) -> bool {
         self.always_sudo
     }
 
-    // <REMOVED UUID HERE> allow_pipes :: auto-generated pointer for public function allow_pipes
-    pub fn allow_pipes(&self, defaults: &Defaults) -> bool {
+        pub fn allow_pipes(&self, defaults: &Defaults) -> bool {
         self.allow_pipes.or(defaults.allow_pipes).unwrap_or(false)
     }
 }
 
 impl PositionSpec {
-    // <REMOVED UUID HERE> is_any :: auto-generated pointer for public function is_any
-    pub fn is_any(&self) -> bool {
+        pub fn is_any(&self) -> bool {
         matches!(self, PositionSpec::Any(value) if value == "any")
     }
 }

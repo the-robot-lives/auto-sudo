@@ -21,7 +21,7 @@ struct Entry {
     metadata: String,
 }
 
-// <REMOVED UUID HERE> render :: auto-generated pointer for public function render
+// 〚🔧:4083ca81-e464-586b-b55e-0980574143a9〛 sudoers::render :: Build checksum-pinned NOPASSWD entries from config.
 pub fn render(config: &Config, extra_commands: &[String]) -> Result<String, String> {
     let entries = collect_entries(config, extra_commands)?;
     let mut out = String::new();
@@ -47,7 +47,7 @@ pub fn render(config: &Config, extra_commands: &[String]) -> Result<String, Stri
     Ok(out)
 }
 
-// <REMOVED UUID HERE> write_checked :: auto-generated pointer for public function write_checked
+// 〚🔧:19bfc0b1-5f1c-5bcb-9012-6425c3d158c4〛 sudoers::write_checked :: Temp file + visudo -cf validation + atomic rename.
 pub fn write_checked(path: &Path, body: &str, append: bool) -> Result<(), String> {
     let parent = path
         .parent()
@@ -76,7 +76,7 @@ pub fn write_checked(path: &Path, body: &str, append: bool) -> Result<(), String
     Ok(())
 }
 
-// <REMOVED UUID HERE> toggle :: auto-generated pointer for public function toggle
+// 〚🔧:12404d62-5e4e-59d5-80aa-0a3238ae5ce3〛 sudoers::toggle :: Comment/uncomment a managed entry by id.
 pub fn toggle(path: &Path, entry_id: &str, enable: bool) -> Result<(), String> {
     let body = fs::read_to_string(path)
         .map_err(|err| format!("failed to read {}: {err}", path.display()))?;
@@ -110,7 +110,6 @@ pub fn toggle(path: &Path, entry_id: &str, enable: bool) -> Result<(), String> {
     fs::write(path, next).map_err(|err| format!("failed to write {}: {err}", path.display()))
 }
 
-// <REMOVED UUID HERE> check_file :: auto-generated pointer for public function check_file
 pub fn check_file(path: &Path) -> Result<(), String> {
     let status = Command::new("visudo")
         .arg("-cf")
@@ -186,6 +185,7 @@ fn resolve_command(command: &str) -> Result<PathBuf, String> {
     which::which(command).map_err(|err| format!("failed to locate {command}: {err}"))
 }
 
+// 〚🔧:7d16c4bc-3b96-5a78-898f-eb6dd7f81309〛 sudoers::checksum :: sha256:<base64> digest used as the sudoers flag constraint.
 fn checksum(path: &Path) -> Result<String, String> {
     let body = fs::read(path).map_err(|err| format!("failed to read {}: {err}", path.display()))?;
     let digest = Sha256::digest(body);

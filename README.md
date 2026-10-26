@@ -1,5 +1,7 @@
 # auto-sudo
 
+〚📁:f30274f5-eb1a-553b-b80d-0bc2f4c8d374〛 README.md :: Project overview — why, install, commands, rule model.
+
 **Repo:** https://github.com/the-robot-lives/auto-sudo
 
 A Rust CLI plus shell wrapper generator for commands that should transparently use `sudo` only when configured rules say escalation is needed.
