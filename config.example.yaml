@@ -1,5 +1,7 @@
 # auto-sudo config.yaml
 #
+# 〚📁:b60a60ec-b000-5ceb-8b1f-3adfb4e4a7ec〛 config.example.yaml :: Example rule set — anchors shared rule bodies across commands.
+#
 # Install location:
 #   ~/.config/auto-sudo/config.yaml
 #
