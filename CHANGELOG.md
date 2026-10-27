@@ -1,5 +1,8 @@
 # Changelog — utilities/shell/auto-sudo
 
+## 2026-10-28
+- docs: add AGENT-README.md (agent orientation)
+
 ## [Unreleased]
 - Refreshed PROJ-ARCH.md / PROJ-LAYOUT.md (+ summaries) to reflect current module layout
 
